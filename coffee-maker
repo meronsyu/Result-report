@@ -1,0 +1,113 @@
+import sys
+game_end = True
+global money
+
+MENU = {
+    "espresso": {
+        "ingredients": {
+            "water": 50,
+            "coffee": 18,
+        },
+        "cost": 1.5,
+    },
+    "latte": {
+        "ingredients": {
+            "water": 200,
+            "milk": 150,
+            "coffee": 24,
+        },
+        "cost": 2.5,
+    },
+    "cappuccino": {
+        "ingredients": {
+            "water": 250,
+            "milk": 100,
+            "coffee": 24,
+        },
+        "cost": 3.0,
+    }
+}
+
+resources = {
+    "water": 300,
+    "milk": 200,
+    "coffee": 100,
+}
+
+def sufficient(drink):
+    if resources['water'] < drink["ingredients"]['water']:
+        return "water"
+    if resources["milk"] < drink["ingredients"]["milk"]:
+        return "milk"
+    if resources["coffee"] < drink["ingredients"]["coffee"]:
+        return "coffee"
+    else: 
+        return "sufficient"
+    
+def sufficient_espresso(drink):
+    if resources['water'] < drink["ingredients"]['water']:
+        return "water"
+    if resources["coffee"] < drink["ingredients"]["coffee"]:
+        return "coffee"
+    else:
+        return "sufficient"
+    
+def sum_money(quarters,dimes,nickles,pennies):
+    sum = 0
+    sum += quarters * 0.25
+    sum += dimes * 0.10
+    sum += nickles * 0.05
+    sum += pennies * 0.01
+    return sum
+    
+def reflect_resources(drink):
+    global money
+    resources['water'] -= drink["ingredients"]["water"]
+    resources["milk"] -= drink["ingredients"]["milk"]
+    resources["coffee"] -= drink["ingredients"]["coffee"]
+    money -= drink["cost"]
+    money = round(money,1)
+    print(f"Here is ${money} dollars in change")
+    return resources
+
+def reflect_resources_espresso(drink):
+    global money
+    resources['water'] -= drink["ingredients"]["water"]
+    resources["coffee"] -= drink["ingredients"]["coffee"]
+    money -= drink["cost"]
+    money = round(money,1)
+    print(f"Here is ${money} dollars in change")
+    return resources
+
+
+while (game_end):
+    money = 0
+    ask = input("What would you like? (espresso/latte/cappuccino):")
+    order = MENU[ask]
+    if ask == "off":
+        sys.exit()
+    if ask == "report":
+        print(f"Water: {resources['water']}ml\nMilk: {resources['milk']}ml\nCoffee: {resources['coffee']}g\nMoney: {money}\n")
+    if ask == "espresso":
+        if sufficient_espresso(order) != "sufficient":
+            print(f"Sorry there is not enough {sufficient_espresso(order)}.")
+    if ask == "latte" or ask == "cappuccino":
+        if sufficient(order) != "sufficient":
+            print(f"Sorry there is not enough {sufficient(order)}.")
+    quarters = int(input("quarters:"))
+    dimes = int(input("dimes:"))
+    nickles = int(input("nickles:"))
+    pennies = int(input("pennies:"))
+    
+    money = sum_money(quarters,dimes,nickles,pennies)
+    if(money < MENU[ask]["cost"]):
+        print("Sorry that's not enough money. Money refunded.")
+        
+    if ask == "espresso":
+        resources = reflect_resources_espresso(order)
+        print(resources)
+    if ask == "latte" or ask == "cappuccino":
+        resources = reflect_resources(order)
+        print(resources)
+        
+    print(f"Here is your {ask} ☕️. Enjoy!")
